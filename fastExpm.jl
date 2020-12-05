@@ -29,7 +29,7 @@ function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
     delta=1;
 
     # Run Taylor series procedure on the CPU
-    if nonzeros(A)/length(A)>0.25 || length(A)<64^2
+    if nnz_ext(A)/length(A)>0.25 || length(A)<64^2
         A=Matrix(A);
         P=Matrix((1.0+0*im)*I,size(A)); next_term=P; n=1;
     else
@@ -43,7 +43,7 @@ function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
             next_term=(1/n)*A*next_term;
             #Eliminate small elements
             next_term=droptolerance!(next_term, nonzero_tol);
-            if nonzeros(next_term)/length(next_term)>0.25
+            if nnz_ext(next_term)/length(next_term)>0.25
                 next_term=Matrix(next_term);
             end
         else
@@ -57,7 +57,7 @@ function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
     for n=1:log2(scaling_factor)
         P=P*P;
         if issparse(P)
-            if nonzeros(P)/length(P)>0.25
+            if nnz_ext(P)/length(P)>0.25
                 P = droptolerance!(P, nonzero_tol);
             else
                 P=Matrix(P);
@@ -74,9 +74,9 @@ function droptolerance!(A::SparseMatrixCSC, tolerance)
     droptol!(A, tolerance) # Native routine, faster
 end
 
-function nonzeros(A::Matrix)
+function nnz_ext(A::Matrix)
     count(x->x>0, abs.(A))
 end
-function nonzeros(A::SparseMatrixCSC)
+function nnz_ext(A::SparseMatrixCSC)
     nnz(A) # Native routine, faster
 end
