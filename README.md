@@ -1,7 +1,7 @@
 # fastExpm.jl
 
 This is a fast implementation of exponential matrix for large full/sparse matrices, commonly found in (quantum) physics simulations.
-It is significantly faster than Julia's exp implementation for matrices bigger than 10x10.
+It is significantly faster than Julia's exp implementation for matrices bigger than 16x16.
 
 ## Requirements
 ### Needed
