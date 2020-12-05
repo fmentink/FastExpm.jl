@@ -15,6 +15,7 @@ using SparseArrays
  The code automatically switches from sparse to full if sparsity is below 25% to maintain speed.
 
  This code was originally developed by Ilya Kuprov (http://spindynamics.org/) and has been adapted by F. Mentink-Vigier (fmentink@magnet.fsu.edu)
+ and Murari Soundararajan (murari@magnet.fsu.edu)
  If you use this code, please cite
   - H. J. Hogben, M. Krzystyniak, G. T. P. Charnock, P. J. Hore and I. Kuprov, Spinach – A software library for simulation of spin dynamics in large spin systems, J. Magn. Reson., 2011, 208, 179–194.
   - I. Kuprov, Diagonalization-free implementation of spin relaxation theory for large spin systems., J. Magn. Reson., 2011, 209, 31–38.
