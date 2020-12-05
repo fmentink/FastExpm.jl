@@ -27,7 +27,7 @@ function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
     delta=1;
 
     # Run Taylor series procedure on the CPU
-    P=sparse(I,size(A)); next_term=P; n=1;
+    P=sparse(1.0I,size(A)); next_term=P; n=1;
     if nonzeros(A)/length(A)>0.25 || length(A)<64^2
         A=Matrix(A);
     else
