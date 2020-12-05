@@ -3,6 +3,8 @@ using SparseArrays
 
 """
     fastExpm(A)
+    fastExpm(A; threshold=1e-6)
+    fastExpm(A; nonzero_tol=1e-14)
     fastExpm(A; threshold=1e-6, nonzero_tol=1e-14)
 
  This function efficiently implements matrix exponentiation for sparse and full matrices.
