@@ -10,8 +10,8 @@ using SparseArrays
  Currently works only on the CPU
 
  Two optional keyword arguments are used to speed up the computation and preserve sparsity.
- [1] threshold determines the threshold for the Taylor series (default 1e-6): e.g. fastExpm(A, threshold=1e-10) 
- [2] nonzero_tol strips elements smaller than nonzero_tol at each computation step to preserve sparsity (default 1e-14) ,e.g. fastExpm(A, nonzero_tol=1e-10) 
+ [1] threshold determines the threshold for the Taylor series (default 1e-6): e.g. fastExpm(A, threshold=1e-10)
+ [2] nonzero_tol strips elements smaller than nonzero_tol at each computation step to preserve sparsity (default 1e-14) ,e.g. fastExpm(A, nonzero_tol=1e-10)
  The code automatically switches from sparse to full if sparsity is below 25% to maintain speed.
 
  This code was originally developed by Ilya Kuprov (http://spindynamics.org/) and has been adapted by F. Mentink-Vigier (fmentink@magnet.fsu.edu)
@@ -19,20 +19,20 @@ using SparseArrays
  If you use this code, please cite
   - H. J. Hogben, M. Krzystyniak, G. T. P. Charnock, P. J. Hore and I. Kuprov, Spinach – A software library for simulation of spin dynamics in large spin systems, J. Magn. Reson., 2011, 208, 179–194.
   - I. Kuprov, Diagonalization-free implementation of spin relaxation theory for large spin systems., J. Magn. Reson., 2011, 209, 31–38.
-""" 
+"""
 function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
     mat_norm=norm(A,Inf);
     scaling_factor = nextpow(2,mat_norm); # Native routine, faster
-    A = A/scaling_factor;
+    A = A./scaling_factor;
     delta=1;
 
     # Run Taylor series procedure on the CPU
     if nonzeros(A)/length(A)>0.25 || length(A)<64^2
         A=Matrix(A);
-        P=Matrix(1.0I,size(A)); next_term=P; n=1;
+        P=Matrix((1.0+0*im)*I,size(A)); next_term=P; n=1;
     else
         A=sparse(A);
-        P=sparse(1.0I,size(A)); next_term=P; n=1;
+        P=sparse((1.0+0*im)*I,size(A)); next_term=P; n=1;
     end
 
     while delta>threshold
