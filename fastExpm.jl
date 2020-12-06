@@ -57,7 +57,7 @@ function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
     for n=1:log2(scaling_factor)
         P=P*P;
         if issparse(P)
-            if nnz_ext(P)/length(P)>0.25
+            if nnz_ext(P)/length(P)<0.25
                 P = droptolerance!(P, nonzero_tol);
             else
                 P=Matrix(P);
