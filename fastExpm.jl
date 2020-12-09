@@ -8,7 +8,7 @@ using SparseArrays
     fastExpm(A; threshold=1e-6, nonzero_tol=1e-14)
 
  This function efficiently implements matrix exponentiation for sparse and full matrices.
- This code is based on scaling, taylor series and scaling.
+ This code is based on scaling, taylor series and squaring.
  Currently works only on the CPU
 
  Two optional keyword arguments are used to speed up the computation and preserve sparsity.
