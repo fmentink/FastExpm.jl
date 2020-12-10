@@ -22,19 +22,20 @@ using SparseArrays
   - H. J. Hogben, M. Krzystyniak, G. T. P. Charnock, P. J. Hore and I. Kuprov, Spinach – A software library for simulation of spin dynamics in large spin systems, J. Magn. Reson., 2011, 208, 179–194.
   - I. Kuprov, Diagonalization-free implementation of spin relaxation theory for large spin systems., J. Magn. Reson., 2011, 209, 31–38.
 """
-function fastExpm(A;threshold=1e-6,nonzero_tol=1e-14)
+function fastExpm(A::AbstractMatrix;threshold=1e-6,nonzero_tol=1e-14)
     mat_norm=norm(A,Inf);
     scaling_factor = nextpow(2,mat_norm); # Native routine, faster
     A = A./scaling_factor;
     delta=1;
+    rows = LinearAlgebra.checksquare(A); # Throws exception if not square
 
     # Run Taylor series procedure on the CPU
-    if nnz_ext(A)/length(A)>0.25 || length(A)<64^2
+    if nnz_ext(A)/(rows^2)>0.25 || rows<64
         A=Matrix(A);
-        P=Matrix((1.0+0*im)*I,size(A)); next_term=P; n=1;
+        P=Matrix((1.0+0*im)*I,(rows,rows)); next_term=P; n=1;
     else
         A=sparse(A);
-        P=sparse((1.0+0*im)*I,size(A)); next_term=P; n=1;
+        P=sparse((1.0+0*im)*I,(rows,rows)); next_term=P; n=1;
     end
 
     while delta>threshold
