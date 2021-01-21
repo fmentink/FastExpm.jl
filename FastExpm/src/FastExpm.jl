@@ -1,5 +1,9 @@
+module FastExpm
+
 using LinearAlgebra
 using SparseArrays
+
+export fastExpm
 
 """
     fastExpm(A)
@@ -81,3 +85,6 @@ end
 function nnz_ext(A::SparseMatrixCSC)
     nnz(A) # Native routine, faster
 end
+
+
+end # module

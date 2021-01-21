@@ -1,0 +1,8 @@
+name = "FastExpm"
+uuid = "7868e603-8603-432e-a1a1-694bd70b01f2"
+authors = ["Frederic Mentink-Vigier <fmentink@magnet.fsu.edu>", "Murari Soundararajan <murari@magnet.fsu.edu>"]
+version = "0.9.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
