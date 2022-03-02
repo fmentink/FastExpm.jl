@@ -2,7 +2,8 @@ module FastExpm
 
 using LinearAlgebra
 using SparseArrays
-
+using CUDA
+using CUDA.CUSPARSE
 export fastExpm
 
 """
@@ -35,21 +36,24 @@ function fastExpm(A::AbstractMatrix;threshold=1e-6,nonzero_tol=1e-14)
 
     # Run Taylor series procedure on the CPU
     if nnz_ext(A)/(rows^2)>0.25 || rows<64
-        A=Matrix(A);
-        P=Matrix((1.0+0*im)*I,(rows,rows)); next_term=P; n=1;
+        if issparse(A)
+            A=_dense(A);
+        end
+        P= one(A);#=_dense((1.0+0*im)*I,(rows,rows));=# next_term=P; n=1;
     else
         A=sparse(A);
-        P=sparse((1.0+0*im)*I,(rows,rows)); next_term=P; n=1;
+        P= _sparse(((1.0+0*im)*I,(rows,rows)),A); next_term=P; n=1;
     end
 
+    #show(P)
     while delta>threshold
         # Compute the next term
         if issparse(next_term)
             next_term=(1/n)*A*next_term;
             #Eliminate small elements
             next_term=droptolerance!(next_term, nonzero_tol);
-            if nnz_ext(next_term)/length(next_term)>0.25
-                next_term=Matrix(next_term);
+            if nnz_ext(next_term)/length(next_term)>0.25 && issparse(next_term)
+                next_term=_dense(next_term);
             end
         else
             next_term=(1/n)*next_term*A;
@@ -58,6 +62,7 @@ function fastExpm(A::AbstractMatrix;threshold=1e-6,nonzero_tol=1e-14)
         #Add to the total and increment the counter
         P .+= next_term; n=n+1;
     end
+    #show(P)
     #Squaring of P to generate correct P
     for n=1:log2(scaling_factor)
         P=P*P;
@@ -65,14 +70,14 @@ function fastExpm(A::AbstractMatrix;threshold=1e-6,nonzero_tol=1e-14)
             if nnz_ext(P)/length(P)<0.25
                 P = droptolerance!(P, nonzero_tol);
             else
-                P=Matrix(P);
+                P=_dense(P);
             end
         end
     end
     return P
 end
 
-function droptolerance!(A::Matrix, tolerance)
+function droptolerance!(A::Union{Matrix,CuArray}, tolerance)
     A .= tolerance*round.((1/tolerance).*A)
 end
 function droptolerance!(A::SparseMatrixCSC, tolerance)
@@ -85,6 +90,31 @@ end
 function nnz_ext(A::SparseMatrixCSC)
     nnz(A) # Native routine, faster
 end
+function nnz_ext(A::CuArray)
+    sum(abs.(A).>0)
+end
+function nnz_ext(A::AbstractCuSparseMatrix)
+    nnz(A) # Native routine, faster
+end
 
-
+function _dense(A::SparseMatrixCSC)
+    Matrix(A)
+end
+function _dense(A::AbstractCuSparseMatrix)
+    cu(A)
+end
+function _sparse(A,B)
+    if isa(B,AbstractCuSparseMatrix)
+        cu(sparse(A...))
+    else
+        sparse(A...)
+    end
+end
+function norm(A::CuSparseMatrixCSC,B) #Assume Inf norm
+    A = CuSparseMatrixCSR(A)
+    columns(n,A) = A[n,:];
+    @CUDA.allowscalar rowsums = sum.(columns.(1:size(A,1),(A,)))
+    A = CuSparseMatrixCSC(A)
+    maximum(rowsums)
+end
 end # module
