@@ -8,7 +8,7 @@ It is significantly faster than Julia's exp implementation for matrices bigger t
 - LinearAlgebra 
 - SparseArrays
 
-### Optinal
+### Optional
 - MKL.jl (https://github.com/JuliaLinearAlgebra/MKL.jl), speeds up computations.
 
 ## Description
